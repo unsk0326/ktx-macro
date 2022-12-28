@@ -54,7 +54,28 @@ const removeTabStorageItem = (key) => {
 	localStorage.removeItem(getTabStorageKey(key));
 };
 
+function addMacroTab(tabid) {
+	chrome.storage.local.get(["ktx-macro-tabs"],
+		function (result) {
+			let tabs = result["ktx-macro-tabs"];
+			if (!tabs)
+				tabs = [];
+			if (tabs.indexOf(tabid) === -1) {
+				tabs.push(tabid);
+				console.log("tabs: " + tabs);
+				chrome.storage.local.set({"ktx-macro-tabs": tabs});
+			}
+		}
+	);
+};
+
 (() => {
 	//console.log("content_header");
-	chrome.runtime.sendMessage({type: 'tabs'}, removeUnusedTabStorage);
+	chrome.storage.local.get(["ktx-macro-tabs"],
+		function (result) {
+			let tabs = result["ktx-macro-tabs"];
+			console.log("tabs: " + tabs);
+			removeUnusedTabStorage(tabs);
+		}
+	);
 })();

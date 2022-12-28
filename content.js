@@ -467,6 +467,7 @@ const initialize = () => {
 		{type: 'tabId'}, 
 		function (result) {
 			tabId = result;
+			addMacroTab(tabId);
 			initialize();
 		}
 	);
