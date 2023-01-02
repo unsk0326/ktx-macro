@@ -28,7 +28,7 @@ const removeMacroTab = (tabid) => {
 		function (result) {
 			let tabs = result["ktx-macro-tabs"];
 			console.log('remove tab tabs: ' + tabs + ', tabid: ' + tabid);
-			if (!tabs)
+			if (typeof(tabs) != "object" || !Array.isArray(tabs))
 				tabs = [];
 
 			var index = tabs.indexOf(tabid);

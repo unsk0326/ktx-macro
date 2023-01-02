@@ -58,7 +58,7 @@ const addMacroTab = (tabid) => {
 	chrome.storage.local.get(["ktx-macro-tabs"],
 		function (result) {
 			let tabs = result["ktx-macro-tabs"];
-			if (!tabs)
+			if (typeof(tabs) != "object" || !Array.isArray(tabs))
 				tabs = [];
 			if (tabs.indexOf(tabid) === -1) {
 				tabs.push(tabid);
