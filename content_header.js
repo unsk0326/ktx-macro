@@ -54,7 +54,7 @@ const removeTabStorageItem = (key) => {
 	localStorage.removeItem(getTabStorageKey(key));
 };
 
-function addMacroTab(tabid) {
+const addMacroTab = (tabid) => {
 	chrome.storage.local.get(["ktx-macro-tabs"],
 		function (result) {
 			let tabs = result["ktx-macro-tabs"];
