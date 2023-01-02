@@ -69,6 +69,18 @@ function addMacroTab(tabid) {
 	);
 };
 
+const disableEventListners = () => {
+	const events = ["selectstart", "mousedown", "contextmenu", "copy", "keydown"];
+	events.forEach(function(item) {
+		window.addEventListener(item, stopEventPropagation, true);
+	});
+	
+};
+
+const stopEventPropagation = (event) => {
+	event.stopPropagation();
+};
+
 (() => {
 	//console.log("content_header");
 	chrome.storage.local.get(["ktx-macro-tabs"],

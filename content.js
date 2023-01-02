@@ -463,6 +463,8 @@ const initialize = () => {
 		return;
 	}
 
+	disableEventListners();
+
 	chrome.runtime.sendMessage(
 		{type: 'tabId'}, 
 		function (result) {
