@@ -23,7 +23,7 @@ const sendTelegramMessage = () => {
 	);
 }
 
-function removeMacroTab(tabid) {
+const removeMacroTab = (tabid) => {
 	chrome.storage.local.get(["ktx-macro-tabs"],
 		function (result) {
 			let tabs = result["ktx-macro-tabs"];
@@ -40,7 +40,7 @@ function removeMacroTab(tabid) {
 	);
 }
 
-function checkMacroTabs() {
+const checkMacroTabs = () => {
 	var tabid;
 	for (tabid of tabs) {
 		chrome.tabs.get(tabid, function (tab) {
