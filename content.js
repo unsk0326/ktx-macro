@@ -1,8 +1,8 @@
-const CHECKBOX_COLUMN = [5, 6, 10];
+let CHECKBOX_COLUMN = [5, 6, 10];
 let checkboxLastClickPos = {"row": -1, "column": -1};
 
 const getTableResult = () => {
-	return document.querySelectorAll("#tableResult > tbody > tr");
+	return document.querySelectorAll("#divResult > .tbl_h > tbody > tr");
 };
 
 const getTableResultColumn = (row, column) => {
@@ -14,7 +14,7 @@ const getTableResultCheckbox = (objRow, column) => {
 };
 
 const createHeaderCheckbox = () => {
-	const row = document.querySelector("#tableResult > thead > tr");
+	const row = document.querySelector("#divResult > .tbl_h > thead > tr");
 	var child;
 
 	for (var col of CHECKBOX_COLUMN) {
@@ -34,7 +34,7 @@ const createHeaderCheckbox = () => {
 };
 
 const setHeaderCheckboxEvent = () => {
-	const header = document.querySelector("#tableResult > thead > tr");
+	const header = document.querySelector("#divResult > .tbl_h > thead > tr");
 
 	for (var col of CHECKBOX_COLUMN) {
 		header.querySelector(`th:nth-child(${col}) .ktx-macro-header-checkbox`)
@@ -43,7 +43,7 @@ const setHeaderCheckboxEvent = () => {
 };
 
 const changeHeaderCheckbox = (event) => {
-	const rows = document.querySelectorAll("#tableResult > tbody > tr");
+	const rows = document.querySelectorAll("#divResult > .tbl_h > tbody > tr");
 	const child_num = event.target.dataset.column;
 
 	if (!rows || !rows.length) {
@@ -58,7 +58,7 @@ const changeHeaderCheckbox = (event) => {
 };
 
 const createCheckbox = () => {
-	const rows = document.querySelectorAll("#tableResult > tbody > tr");
+	const rows = document.querySelectorAll("#divResult > .tbl_h > tbody > tr");
 
 	if (!rows.length) {
 		return;
@@ -159,71 +159,35 @@ const macroStop = () => {
 const macro = () => {
 	let uid = 0;
 	let $row;
-	const $rows = document.querySelectorAll("#tableResult > tbody > tr");
+	const $rows = document.querySelectorAll("#divResult > .tbl_h > tbody > tr");
 	const len = $rows.length;
-	var succeeded = false;
+	let succeeded = false;
+	let $td, $a;
 
 	if (!len) {
 		return;
 	}
 
-	for (let i = 0; i < len; i++) {
+	for (let i = 0; i < len && !succeeded; i++) {
 		$row = $rows[i];
+		for (let col of CHECKBOX_COLUMN) {
+			if (isChecked(++uid)) {
+				$td = $row.querySelector(`td:nth-child(${col})`);
+				$td.style.backgroundColor = "#f03e3e";
+				$a = $td.querySelector(`a:nth-child(1)`);
+				const $button =
+					$td.querySelector('[src="/docs/2007/img/common/icon_apm_bl.gif"]') ||
+					$td.querySelector('[src="/docs/2007/img/common/icon_apm_rd.gif"]');
 
-		if (isChecked(++uid)) {
-			$row.querySelector("td:nth-child(5)").style.backgroundColor = "#f03e3e";
-			const $button =
-				$row
-					.querySelector("td:nth-child(5)")
-					.querySelector('[src="/docs/2007/img/common/icon_apm_bl.gif"]') ||
-				$row
-					.querySelector("td:nth-child(5)")
-					.querySelector('[src="/docs/2007/img/common/icon_apm_rd.gif"]');
-
-			if ($button) {
-				new Audio(chrome.runtime.getURL("tada.mp3")).play();
-				removeTabStorageItem("macro");
-				chrome.runtime.sendMessage({ type: "successTicketing" });
-				inject_click($button.closest("a"));
-				succeeded = true;
-				break;
-			}
-		}
-
-		if (isChecked(++uid)) {
-			$row.querySelector("td:nth-child(6)").style.backgroundColor = "#f03e3e";
-			const $button =
-				$row
-					.querySelector("td:nth-child(6)")
-					.querySelector('[src="/docs/2007/img/common/icon_apm_bl.gif"]') ||
-				$row
-					.querySelector("td:nth-child(6)")
-					.querySelector('[src="/docs/2007/img/common/icon_apm_rd.gif"]');
-
-			if ($button) {
-				new Audio(chrome.runtime.getURL("tada.mp3")).play();
-				removeTabStorageItem("macro");
-				chrome.runtime.sendMessage({ type: "successTicketing" });
-				inject_click($button.closest("a"));
-				succeeded = true;
-				break;
-			}
-		}
-
-		if (isChecked(++uid)) {
-			$row.querySelector("td:nth-child(10)").style.backgroundColor = "#f03e3e";
-			const $button = 
-				$row
-					.querySelector("td:nth-child(10)")
-					.querySelector('[src="/docs/2007/img/common/icon_wait.gif"]');
-
-			if ($button) {
-				new Audio(chrome.runtime.getURL("tada.mp3")).play();
-				removeTabStorageItem("macro");
-				chrome.runtime.sendMessage({ type: "successTicketing" });
-				inject_click($button.closest("a"));
-				succeeded = true;
-				break;
+				if ($a) {
+					new Audio(chrome.runtime.getURL("tada.mp3")).play();
+					removeTabStorageItem("macro");
+					chrome.runtime.sendMessage({ type: "successTicketing" });
+					//inject_click($button.closest("a"));
+					inject_click($a);
+					succeeded = true;
+					break;
+				}
 			}
 		}
 	}
@@ -455,15 +419,21 @@ const initialize = () => {
 };
 
 (() => {
+	disableEventListners();
+
 	if (location.href.startsWith(POPUP_URI)) {
 		inject_nonstop_popup();
 		return;
 	}
-	else if (!location.href.startsWith(MAIN_URI) || !document.querySelector(".btn_inq")) {
+	else if (location.href.startsWith(MAIN_URI) && document.querySelector(".btn_inq")) {
+		CHECKBOX_COLUMN = [5, 6, 10];
+	}
+	else if (location.href.startsWith(FAMILY_URI) && document.querySelector(".btn_inq")) {
+		CHECKBOX_COLUMN = [5];
+	}
+	else {
 		return;
 	}
-
-	disableEventListners();
 
 	chrome.runtime.sendMessage(
 		{type: 'tabId'}, 

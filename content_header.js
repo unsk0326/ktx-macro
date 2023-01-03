@@ -3,6 +3,7 @@ let uid = 1;
 let reloadTimeoutID = null;
 
 const MAIN_URI = "https://www.letskorail.com/ebizprd/EbizPrdTicketPr21111_i1.do";
+const FAMILY_URI = "https://www.letskorail.com/ebizprd/EbizPrdTicketPr21151_i1.do";
 const LOGIN_PAGE_URI = "https://www.letskorail.com/korail/com/login.do";
 const POPUP_URI = "https://www.letskorail.com/docs/pz/pz_msg_pop1.jsp";
 const PAGE_TIMEOUT = 15000;
@@ -70,15 +71,22 @@ const addMacroTab = (tabid) => {
 };
 
 const disableEventListners = () => {
-	const events = ["selectstart", "mousedown", "contextmenu", "copy", "keydown"];
+	//const events = ["selectstart", "mousedown", "contextmenu", "copy", "keydown"];
+	const events = ["selectstart", "mousedown", "mousemove", "contextmenu", "copy"];
 	events.forEach(function(item) {
 		window.addEventListener(item, stopEventPropagation, true);
 	});
+	window.addEventListener("keydown", stopKeydownPropogation, true);
 	
 };
 
 const stopEventPropagation = (event) => {
 	event.stopPropagation();
+};
+
+const stopKeydownPropogation = (event) => {
+	if (event.keyCode == 17 || event.ctrlKey)
+		event.stopPropagation();
 };
 
 (() => {
