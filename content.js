@@ -1,4 +1,8 @@
 let CHECKBOX_COLUMN = [5, 6, 10];
+const MAIN_PAGE = 0;
+const FAMILY_PAGE = 1;
+let RESERVE_BUTTON = {};
+let PAGE = MAIN_PAGE;
 let checkboxLastClickPos = {"row": -1, "column": -1};
 
 const getTableResult = () => {
@@ -171,29 +175,39 @@ const macro = () => {
 	for (let i = 0; i < len && !succeeded; i++) {
 		$row = $rows[i];
 		for (let col of CHECKBOX_COLUMN) {
-			if (isChecked(++uid)) {
-				$td = $row.querySelector(`td:nth-child(${col})`);
-				$td.style.backgroundColor = "#f03e3e";
-				$a = $td.querySelector(`a:nth-child(1)`);
-				const $button =
-					$td.querySelector('[src="/docs/2007/img/common/icon_apm_bl.gif"]') ||
-					$td.querySelector('[src="/docs/2007/img/common/icon_apm_rd.gif"]');
-
-				if ($a) {
-					new Audio(chrome.runtime.getURL("tada.mp3")).play();
-					removeTabStorageItem("macro");
-					chrome.runtime.sendMessage({ type: "successTicketing" });
-					//inject_click($button.closest("a"));
-					inject_click($a);
-					succeeded = true;
+			if (!isChecked(++uid)) {
+				continue;
+			}
+			$td = $row.querySelector(`td:nth-child(${col})`);
+			$td.style.backgroundColor = "#f03e3e";
+			$a = $td.querySelector(`a:nth-child(1)`);
+			let $button;
+			for (let img of RESERVE_BUTTON[col]) {
+				//console.log(img);
+				//src starts with img
+				$button = $td.querySelector('[src^="' + img + '"]');
+				if ($button) {
 					break;
 				}
 			}
+
+			if ($a) {
+				new Audio(chrome.runtime.getURL("tada.mp3")).play();
+				removeTabStorageItem("macro");
+				chrome.runtime.sendMessage({ type: "successTicketing" });
+				//inject_click($button.closest("a"));
+				inject_click($a);
+				succeeded = true;
+				break;
+			}
+		}
+		if (succeeded) {
+			break;
 		}
 	}
 
 	if (!succeeded)
-		setTimeout(reload, 1000);
+		setTimeout(reload, 1200);
 };
 
 const reload = () => {
@@ -425,11 +439,31 @@ const initialize = () => {
 		inject_nonstop_popup();
 		return;
 	}
-	else if (location.href.startsWith(MAIN_URI) && document.querySelector(".btn_inq")) {
-		CHECKBOX_COLUMN = [5, 6, 10];
+	else if (!document.querySelector(".btn_inq")) {
+		return;
 	}
-	else if (location.href.startsWith(FAMILY_URI) && document.querySelector(".btn_inq")) {
+
+	if (location.href.startsWith(MAIN_URI)) {
+		PAGE = MAIN_PAGE;
+		CHECKBOX_COLUMN = [5, 6, 10];
+		RESERVE_BUTTON[5] = [
+			"/docs/2007/img/common/icon_apm_bl.gif", 
+			"/docs/2007/img/common/icon_apm_rd.gif"
+		];
+		RESERVE_BUTTON[6] = [
+			"/docs/2007/img/common/icon_apm_bl.gif", 
+			"/docs/2007/img/common/icon_apm_rd.gif"
+		];
+		RESERVE_BUTTON[10] = [
+			"/docs/2007/img/common/icon_wait.gif"
+		];
+	} 
+	else if (location.href.startsWith(FAMILY_URI)) {
+		PAGE = FAMILY_PAGE;
 		CHECKBOX_COLUMN = [5];
+		RESERVE_BUTTON[5] = [
+			"/docs/2007/img/persent/btn"
+		];
 	}
 	else {
 		return;
