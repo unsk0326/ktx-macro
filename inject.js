@@ -33,7 +33,13 @@ function ignoreDailyPopup() {
 		openGwangjuShuttleDialog = function () {};
 	}
 }
-
+// alert msg 제거
+function override_alert() {
+	window.alert = function alert(msg) {
+		console.log('Hidden Alert ' + msg);
+	};
+}
 ignoreNonstopPopup();
 ignoreConfirmPeople();
 ignoreDailyPopup();
+override_alert();
